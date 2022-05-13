@@ -1,3 +1,14 @@
+# Original TrasTrack Documentation
+https://github.com/PeizeSun/TransTrack
+-	Use my steps below
+-	Important: ignore the installation/requirements section. Use below:
+    o	pip install torch==1.8.0+cu111 torchvision==0.9.0+cu111 -f https://download.pytorch.org/whl/torch_stable.html
+-	My repo comments out certain things that create errors. Mainly to do with torch
+-	Lacking explanation of program structure. Will fill in other relevant information below
+
+# Additional Documentation
+
+
 # Welcome to GitHub
 
 Welcome to GitHub—where millions of developers work together on software. Ready to get started? Let’s learn how this all works by building and publishing your first GitHub Pages website!
