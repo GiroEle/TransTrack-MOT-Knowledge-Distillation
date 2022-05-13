@@ -1,3 +1,7 @@
+## Description
+Files and instructions necessary to use and reproduce the MOT knowledge distillation method I present.
+Free Space: 7GB
+
 ## Original TrasTrack Documentation
 https://github.com/PeizeSun/TransTrack
 -	Use my steps below
