@@ -127,96 +127,64 @@ python .\demo_videosim_testing OUT.py --max_size 800 --video_input demo.mp4 --re
 python ./track_tools/eval_motchallenge.py --groundtruths mot/train --tests output/val/tracks --gt_type _val_half --eval_official --score_threshold -1
 ```
   - --tests output/val/tracks  is changed to the track output folder
+
+- eval and building videoframes with 
+```
+python main_track.py  --output_dir . --dataset_file mot --coco_path mot --batch_size 1 --resume ./output/checkpoint.pth --eval --with_box_refine --num_queries 500
+```
+```
+python track_tools/txt2video.py 
+```
+```
+py track_tools/eval_motchallenge.py --groundtruths mot/train --tests val/tracks --gt_type _val_half --eval_official --score_threshold -1
+```
+
+
 ## Knowledge Distillation Dataset Creation
 
+**./main_track_AnnGen_Train.py**
+**./main_track_AnnGen_Val.py**
 
-# Welcome to GitHub
+Input: Takes a trained model from the “resume” arg and parameters relevant to the model.
 
-Welcome to GitHub—where millions of developers work together on software. Ready to get started? Let’s learn how this all works by building and publishing your first GitHub Pages website!
+Output: New tracking output for training/validation dataset, stored in ./output/KD_eval and ./output/KD_eval_val (opposed to default TransTrack storing validation results in val)
 
-## Repositories
-
-Right now, we’re in your first GitHub **repository**. A repository is like a folder or storage space for your project. Your project's repository contains all its files such as code, documentation, images, and more. It also tracks every change that you—or your collaborators—make to each file, so you can always go back to previous versions of your project if you make any mistakes.
-
-This repository contains three important files: The HTML code for your first website on GitHub, the CSS stylesheet that decorates your website with colors and fonts, and the **README** file. It also contains an image folder, with one image file.
-
-## Describe your project
-
-You are currently viewing your project's **README** file. **_README_** files are like cover pages or elevator pitches for your project. They are written in plain text or [Markdown language](https://guides.github.com/features/mastering-markdown/), and usually include a paragraph describing the project, directions on how to use it, who authored it, and more.
-
-[Learn more about READMEs](https://help.github.com/en/articles/about-readmes)
-
-## Your first website
-
-**GitHub Pages** is a free and easy way to create a website using the code that lives in your GitHub repositories. You can use GitHub Pages to build a portfolio of your work, create a personal website, or share a fun project that you coded with the world. GitHub Pages is automatically enabled in this repository, but when you create new repositories in the future, the steps to launch a GitHub Pages website will be slightly different.
-
-[Learn more about GitHub Pages](https://pages.github.com/)
-
-## Rename this repository to publish your site
-
-We've already set-up a GitHub Pages website for you, based on your personal username. This repository is called `hello-world`, but you'll rename it to: `username.github.io`, to match your website's URL address. If the first part of the repository doesn’t exactly match your username, it won’t work, so make sure to get it right.
-
-Let's get started! To update this repository’s name, click the `Settings` tab on this page. This will take you to your repository’s settings page. 
-
-![repo-settings-image](https://user-images.githubusercontent.com/18093541/63130482-99e6ad80-bf88-11e9-99a1-d3cf1660b47e.png)
-
-Under the **Repository Name** heading, type: `username.github.io`, where username is your username on GitHub. Then click **Rename**—and that’s it. When you’re done, click your repository name or browser’s back button to return to this page.
-
-<img width="1039" alt="rename_screenshot" src="https://user-images.githubusercontent.com/18093541/63129466-956cc580-bf85-11e9-92d8-b028dd483fa5.png">
-
-Once you click **Rename**, your website will automatically be published at: https://your-username.github.io/. The HTML file—called `index.html`—is rendered as the home page and you'll be making changes to this file in the next step.
-
-Congratulations! You just launched your first GitHub Pages website. It's now live to share with the entire world
-
-## Making your first edit
-
-When you make any change to any file in your project, you’re making a **commit**. If you fix a typo, update a filename, or edit your code, you can add it to GitHub as a commit. Your commits represent your project’s entire history—and they’re all saved in your project’s repository.
-
-With each commit, you have the opportunity to write a **commit message**, a short, meaningful comment describing the change you’re making to a file. So you always know exactly what changed, no matter when you return to a commit.
-
-## Practice: Customize your first GitHub website by writing HTML code
-
-Want to edit the site you just published? Let’s practice commits by introducing yourself in your `index.html` file. Don’t worry about getting it right the first time—you can always build on your introduction later.
-
-Let’s start with this template:
+Example:
 
 ```
-<p>Hello World! I’m [username]. This is my website!</p>
+python main_track_AnnGen_Train.py --eval --num_workers 1 --resume ./671mot17_crowdhuman_mot17.pth --output_dir ./output --dataset_file mot --coco_path mot --batch_size 1 --with_box_refine --epochs 1 --lr_drop 100 --num_queries 500
 ```
 
-To add your introduction, copy our template and click the edit pencil icon at the top right hand corner of the `index.html` file.
-
-<img width="997" alt="edit-this-file" src="https://user-images.githubusercontent.com/18093541/63131820-0794d880-bf8d-11e9-8b3d-c096355e9389.png">
-
-
-Delete this placeholder line:
-
 ```
-<p>Welcome to your first GitHub Pages website!</p>
+python main_track_AnnGen_Val.py --eval --num_workers 1 --resume ./671mot17_crowdhuman_mot17.pth --output_dir ./output --dataset_file mot --coco_path mot --batch_size 1 --with_box_refine --epochs 1 --lr_drop 100 --num_queries 500
 ```
 
-Then, paste the template to line 15 and fill in the blanks.
+Explanation:
 
-<img width="1032" alt="edit-githuboctocat-index" src="https://user-images.githubusercontent.com/18093541/63132339-c3a2d300-bf8e-11e9-8222-59c2702f6c42.png">
+- Uses the training/val dataset and creates MOT annotations. Based on ./main_track.py evaluation operation. This originally takes the trained model and creates MOT annotations for the validation dataset. Altered to match real-time input for train dataset as well (inserted sequentially).
 
+- The normal eval operation outputs tracks in output/val folder. This is changed to KD_eval and KD_eval_val for main_track_AnnGen_Train.py and main_track_AnnGen_Val.py. Both will be called “val” folder for simplicity.
 
-When you’re done, scroll down to the `Commit changes` section near the bottom of the edit page. Add a short message explaining your change, like "Add my introduction", then click `Commit changes`.
+- Inside of output/val/tracks there is text files containing all annotations for each video (set of frames). The contents of each row in the text files are information about each tracked object detection in each frame:
 
+  - frame_id, track_id, bbox_top_left_X, bbox_top_left_Y, bbox_width, bbox_height, -1, -1, -1, -1
+![image](https://user-images.githubusercontent.com/56175932/168344516-22b3aa9b-aa6f-4f4f-b275-c2245bea3dbf.png)
+![image](https://user-images.githubusercontent.com/56175932/168344520-41861de8-8248-44f4-9220-3377d8d7a7e6.png)
 
-<img width="1030" alt="add-my-username" src="https://user-images.githubusercontent.com/18093541/63131801-efbd5480-bf8c-11e9-9806-89273f027d16.png">
+**./building_dataset_annotations.py**
 
-Once you click `Commit changes`, your changes will automatically be published on your GitHub Pages website. Refresh the page to see your new changes live in action.
+input: Requires 1) tracks inside text files, generated from running the previous code in the location it created “./output/KD_eval/tracks/” and "./output/KD_eval_val/tracks/". 2) Copy the “.\mot\annotations” folder to create a duplicate “.\mot\annotations_KD”.
 
-:tada: You just made your first commit! :tada:
+output: Dataset in format required by TransTrack with new annotations in “.\mot\annotations_KD”. This means updating the "./mot/annotations_KD/val_half.json" and "./mot/annotations_KD/train_half.json" which store the annotations.
 
-## Extra Credit: Keep on building!
+Example:
+```
+python building_dataset_annotations.py
+```
 
-Change the placeholder Octocat gif on your GitHub Pages website by [creating your own personal Octocat emoji](https://myoctocat.com/build-your-octocat/) or [choose a different Octocat gif from our logo library here](https://octodex.github.com/). Add that image to line 12 of your `index.html` file, in place of the `<img src=` link.
+Explanation:
+- Just overwrites annotation jsons with new information.
 
-Want to add even more code and fun styles to your GitHub Pages website? [Follow these instructions](https://github.com/github/personal-website) to build a fully-fledged static website.
+**Training KD model**
 
-![octocat](./images/create-octocat.png)
-
-## Everything you need to know about GitHub
-
-Getting started is the hardest part. If there’s anything you’d like to know as you get started with GitHub, try searching [GitHub Help](https://help.github.com). Our documentation has tutorials on everything from changing your repository settings to configuring GitHub from your command line.
+Use ./main_track.py with --KD parameter to use the KD dataset in .\mot\annotations_KD.
